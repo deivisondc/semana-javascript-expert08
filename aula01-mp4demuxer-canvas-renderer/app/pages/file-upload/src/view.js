@@ -6,6 +6,7 @@ export default class View {
   #txtfileName = document.getElementById("fileName");
   #fileUploadWrapper = document.getElementById("fileUploadWrapper");
   #elapsed = document.getElementById("elapsed");
+  /** @type {HTMLCanvasElement} */
   #canvas = document.getElementById("preview-144p");
 
   constructor() {
@@ -50,5 +51,9 @@ export default class View {
 
   updateElpasedTime(text) {
     this.#elapsed.innerText = text;
+  }
+
+  getCanvas() {
+    return this.#canvas.transferControlToOffscreen();
   }
 }

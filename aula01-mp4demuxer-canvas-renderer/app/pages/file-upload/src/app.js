@@ -5,16 +5,35 @@ const view = new View();
 const clock = new Clock();
 let took = "";
 
+const worker = new Worker("./src/worker/worker.js", {
+  type: "module",
+});
+
+worker.onerror = (error) => {
+  console.error(error);
+};
+worker.onmessage = ({ data }) => {
+  console.log(data);
+  if (data.status !== "done") return;
+  clock.stop();
+  view.updateElpasedTime(`Process took ${took.replace("ago", "")}`);
+  console.log("recebi no processo da view", data);
+};
+
 view.configureOnFileChange((file) => {
+  const canvas = view.getCanvas();
+  worker.postMessage(
+    {
+      file,
+      canvas,
+    },
+    [canvas]
+  );
+
   clock.start((time) => {
     took = time;
     view.updateElpasedTime(`Process started ${time}`);
   });
-
-  setTimeout(() => {
-    clock.stop();
-    view.updateElpasedTime(`Process took ${took.replace("ago", "")}`);
-  }, 5000);
 });
 
 async function fakeFetch() {
